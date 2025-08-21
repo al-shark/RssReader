@@ -1,0 +1,49 @@
+@model RssReader.Controllers.FeedDetailsViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@Model.Feed.Name</h1>
+
+<p>URL: @Model.Feed.Url</p>
+
+<form asp-action="Details" method="get">
+    <input type="hidden" name="id" value="@Model.Feed.Id" />
+    <div class="form-group">
+        <label>From Date:</label>
+        <input type="date" name="fromDate" value="@ViewData["FromDate"]" />
+        <label>To Date:</label>
+        <input type="date" name="toDate" value="@ViewData["ToDate"]" />
+        <label>Search Title:</label>
+        <input type="text" name="searchTitle" value="@ViewData["SearchTitle"]" />
+        <input type="submit" value="Filter" class="btn btn-primary" />
+    </div>
+</form>
+
+<form asp-action="Reload" method="post">
+    <input type="hidden" name="id" value="@Model.Feed.Id" />
+    <input type="submit" value="Reload Articles" class="btn btn-secondary" />
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Pub Date</th>
+            <th>Link</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var article in Model.Articles)
+        {
+        <tr>
+            <td>@article.Title</td>
+            <td>@article.PubDate?.ToShortDateString()</td>
+            <td><a href="@article.Link" target="_blank">Read Article</a></td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index">Back to List</a>
