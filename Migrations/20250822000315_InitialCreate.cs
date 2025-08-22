@@ -15,10 +15,10 @@ namespace RssReader.Migrations
                 name: "Feeds",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -29,13 +29,13 @@ namespace RssReader.Migrations
                 name: "Articles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Title = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    Link = table.Column<string>(type: "TEXT", nullable: false),
-                    PubDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    FeedId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Link = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PubDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FeedId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
