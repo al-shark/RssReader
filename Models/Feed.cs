@@ -12,7 +12,8 @@ namespace RssReader.Models
         public string Name { get; set; }
 
         [Required]
-        [Url]
+        [Url(ErrorMessage = "Please enter a valid RSS feed URL")]
+        [RegularExpression(@"^https?://.*", ErrorMessage = "URL must use HTTP or HTTPS")]
         public string Url { get; set; }
 
         public ICollection<Article> Articles { get; set; } = new List<Article>();
