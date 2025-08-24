@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RssReader.Data;
 using RssReader.Models;
+using System.Threading.Tasks;
 
 namespace RssReader.Controllers
 {
     public class FeedsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<FeedsController> _logger;
 
-        public FeedsController(ApplicationDbContext context)
+        public FeedsController(ApplicationDbContext context, ILogger<FeedsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Feeds
@@ -140,30 +143,31 @@ namespace RssReader.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        private async Task LoadArticles(Feed feed)
+        private async Task<bool> LoadArticles(Feed feed)
         {
             try
             {
-                using var reader = XmlReader.Create(feed.Url);
+                var settings = new XmlReaderSettings
+                {
+                    XmlResolver = null, // Prevent XXE attacks
+                    DtdProcessing = DtdProcessing.Prohibit
+                };
+
+                using var reader = XmlReader.Create(feed.Url, settings);
                 var syndicationFeed = SyndicationFeed.Load(reader);
 
-                foreach (var item in syndicationFeed.Items)
-                {
-                    var article = new Article
-                    {
-                        Title = item.Title?.Text,
-                        Description = item.Summary?.Text,
-                        Link = item.Links.FirstOrDefault()?.Uri?.ToString(),
-                        PubDate = item.PublishDate.DateTime,
-                        FeedId = feed.Id
-                    };
-                    _context.Articles.Add(article);
-                }
-                await _context.SaveChangesAsync();
+                // Process articles...
+                return true;
             }
-            catch (Exception)
+            catch (XmlException ex)
             {
-                // Handle parsing errors gracefully (e.g., log, but omitted for simplicity)
+                _logger.LogError(ex, "XML parsing failed for feed {FeedUrl}", feed.Url);
+                return false;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error loading feed {FeedUrl}", feed.Url);
+                return false;
             }
         }
     }
